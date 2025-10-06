@@ -5,3 +5,40 @@ include:
       - kaniko-ci.yml
     ref: main
   - local: "/includes/java-mvn.yml"
+
+cache:
+  paths:
+    - .m2/repository/
+    - node_modules
+
+variables:
+  TAG: "${CI_COMMIT_REF_SLUG}"
+  DOCKERFILE: Dockerfile
+  REGISTRY_URL: "${IMAGE_REPOSITORY}"
+
+stages:
+  - read-secret
+  - test-app
+  - docker-build
+
+read_secret:
+  stage: read-secret
+  extends:
+    - .vault:read_secret
+
+test-app:
+  variables:
+    BUILD_IMAGE_NAME: maven:3.8-openjdk-17
+    WORKING_DIR: .
+  stage: test-app
+  extends:
+    - .java:sonar
+  allow_failure: true
+
+docker-build:
+  variables:
+    WORKING_DIR: "."
+    IMAGE_NAME: java-demo
+  stage: docker-build
+  extends:
+    - .kaniko:simple-build-push
