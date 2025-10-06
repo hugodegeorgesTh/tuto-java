@@ -1,0 +1,7 @@
+include:
+  - project: $CATALOG_PATH
+    file:
+      - vault-ci.yml
+      - kaniko-ci.yml
+    ref: main
+  - local: "/includes/java-mvn.yml"
