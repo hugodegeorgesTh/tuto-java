@@ -1,3 +1,30 @@
+include:
+  - project: $CATALOG_PATH
+    file:
+      - vault-ci.yml
+      - kaniko-ci.yml
+    ref: main
+  - local: "/includes/java-mvn.yml"
+
+# default:
+#  tags:
+#    - ADD_CUSTOM_TAG_HERE
+
+cache:
+  paths:
+    - .m2/repository/
+    - node_modules
+
+variables:
+  TAG: "${CI_COMMIT_REF_SLUG}"
+  DOCKERFILE: Dockerfile
+  REGISTRY_URL: "${IMAGE_REPOSITORY}"
+
+stages:
+  - read-secret
+  - test-app
+  - docker-build
+
 read_secret:
   stage: read-secret
   extends:
